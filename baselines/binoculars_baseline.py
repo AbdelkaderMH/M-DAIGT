@@ -21,7 +21,7 @@ DEVICE_2 = "cuda:1" if torch.cuda.device_count() > 1 else DEVICE_1
 
 class Binoculars:
     """
-    Zero-shot detection baseline for shared task.
+    Zero-shot detection baseline.
     
     Given an input text, the Binoculars method computes a score based on the ratio of
     the perplexity (from the performer model) and the entropy (between the observer and performer),
@@ -109,7 +109,7 @@ class Binoculars:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Binoculars Zero-Shot Detection Baseline for Shared Task (Human vs Machine)"
+        description="Binoculars Zero-Shot Detection Baseline"
     )
     parser.add_argument("--test_file_path", "-t", required=True,
                         help="Path to the test CSV file (with columns: id, text).", type=str)
