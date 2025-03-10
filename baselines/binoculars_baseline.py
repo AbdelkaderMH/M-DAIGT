@@ -6,8 +6,8 @@ import numpy as np
 import torch
 import transformers
 from transformers import AutoModelForCausalLM, AutoTokenizer
-from typing import Union
-from utils import assert_tokenizer_consistency, entropy, perplexity  # Adjust import as needed
+from typing import Union, List, Tuple
+from utils import assert_tokenizer_consistency, entropy, perplexity 
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -21,8 +21,8 @@ DEVICE_2 = "cuda:1" if torch.cuda.device_count() > 1 else DEVICE_1
 
 class Binoculars:
     """
-    Zero-shot detection baseline.
-
+    Zero-shot detection baseline for shared task.
+    
     Given an input text, the Binoculars method computes a score based on the ratio of
     the perplexity (from the performer model) and the entropy (between the observer and performer),
     and then classifies the input as "machine" if the score is below a threshold,
@@ -73,7 +73,7 @@ class Binoculars:
         else:
             raise ValueError(f"Invalid mode: {mode}")
 
-    def _tokenize(self, texts: list[str]) -> transformers.BatchEncoding:
+    def _tokenize(self, texts: List[str]) -> transformers.BatchEncoding:
         batch_size = len(texts)
         encodings = self.tokenizer(
             texts,
@@ -86,14 +86,14 @@ class Binoculars:
         return encodings.to(DEVICE_1)
 
     @torch.inference_mode()
-    def _get_logits(self, encodings: transformers.BatchEncoding) -> tuple[torch.Tensor, torch.Tensor]:
+    def _get_logits(self, encodings: transformers.BatchEncoding) -> Tuple[torch.Tensor, torch.Tensor]:
         observer_logits = self.observer_model(**encodings.to(DEVICE_1)).logits
         performer_logits = self.performer_model(**encodings.to(DEVICE_2)).logits
         if DEVICE_1 != "cpu":
             torch.cuda.synchronize()
         return observer_logits, performer_logits
 
-    def compute_score(self, input_text: Union[list[str], str]) -> Union[float, list[float]]:
+    def compute_score(self, input_text: Union[List[str], str]) -> Union[float, List[float]]:
         texts = [input_text] if isinstance(input_text, str) else input_text
         encodings = self._tokenize(texts)
         observer_logits, performer_logits = self._get_logits(encodings)
@@ -102,7 +102,7 @@ class Binoculars:
         scores = ppl / ent
         return scores[0] if isinstance(input_text, str) else scores.tolist()
 
-    def predict(self, input_text: Union[list[str], str]) -> Union[str, list[str]]:
+    def predict(self, input_text: Union[List[str], str]) -> Union[str, List[str]]:
         scores = np.array(self.compute_score(input_text))
         predictions = np.where(scores < self.threshold, "machine", "human")
         return predictions.tolist() if isinstance(input_text, list) else predictions.item()
@@ -125,7 +125,6 @@ if __name__ == "__main__":
                         help="Maximum number of tokens to observe.",)
     parser.add_argument("--use_bfloat16", "-bf", action="store_true",
                         help="Use bfloat16 precision if available.")
-    # New threshold options:
     parser.add_argument("--low_fpr_threshold", default=DEFAULT_BINOCULARS_FPR_THRESHOLD, type=float,
                         help="Threshold for low-fpr mode.")
     parser.add_argument("--accuracy_threshold", default=DEFAULT_BINOCULARS_ACCURACY_THRESHOLD, type=float,
