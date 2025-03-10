@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 import torch
 import transformers
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 from typing import Union, List, Tuple
 from utils import assert_tokenizer_consistency, entropy, perplexity  
 
@@ -39,17 +39,25 @@ class Binoculars:
     ) -> None:
         self._assert_tokenizer_consistency(observer_name_or_path, performer_name_or_path)
         self.change_mode(mode, low_fpr_threshold, accuracy_threshold)
+        
+        # Create a quantization config for 8-bit loading.
+        quantization_config = BitsAndBytesConfig(load_in_8bit=True)
+        
         self.observer_model = AutoModelForCausalLM.from_pretrained(
             observer_name_or_path,
+            quantization_config=quantization_config,
+            device_map="auto",
             trust_remote_code=True,
-            load_in_8bit=True,  
-            device_map="auto"
+            torch_dtype=torch.bfloat16 if use_bfloat16 else torch.float32,
+            token=os.environ.get("HF_TOKEN", None)
         )
         self.performer_model = AutoModelForCausalLM.from_pretrained(
             performer_name_or_path,
+            quantization_config=quantization_config,
+            device_map="auto",
             trust_remote_code=True,
-            load_in_8bit=True,  
-            device_map="auto"
+            torch_dtype=torch.bfloat16 if use_bfloat16 else torch.float32,
+            token=os.environ.get("HF_TOKEN", None)
         )
         self.observer_model.eval()
         self.performer_model.eval()
@@ -106,7 +114,7 @@ class Binoculars:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Binoculars Zero-Shot Detection"
+        description="Binoculars Zero-Shot Detection Baseline"
     )
     parser.add_argument("--test_file_path", "-t", required=True,
                         help="Path to the test CSV file (with columns: id, text).", type=str)
