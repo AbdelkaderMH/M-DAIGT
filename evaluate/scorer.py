@@ -32,7 +32,7 @@ def evaluate(pred_file: str, gold_file: str):
     precision_micro = precision_score(merged_df['label_gold'], merged_df['label_pred'], average='micro', zero_division=0)
     recall_micro = recall_score(merged_df['label_gold'], merged_df['label_pred'], average='micro', zero_division=0)
     
-    report = classification_report(merged_df['label_gold'], merged_df['label_pred'], zero_division=0)
+    report = classification_report(merged_df['label_gold'], merged_df['label_pred'], zero_division=0, digits=4)
     
     return macro_f1, micro_f1, accuracy, precision_macro, recall_macro, precision_micro, recall_micro, report
 
