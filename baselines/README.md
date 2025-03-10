@@ -19,13 +19,12 @@ The test CSV file should have the following columns:
 
 ```bash
 python lr_baseline.py \
-  --train_file_path data/train.csv \
-  --dev_file_path data/dev.csv \
-  --test_file_path data/test.csv \
-  --prediction_file_path predictions_lr.csv \
+  --train_file_path ../sample/train.csv \
+  --dev_file_path ../sample/dev.csv \
+  --test_file_path ../sample/test.csv \
+  --prediction_file_path ../output/predictions_lr.csv \
   --ngram_range 1,2 \
   --analyzer word \
-  --dev_size 0.2
 ```
 
 *Notes:*
@@ -49,12 +48,13 @@ The test CSV file should include:
 
 ```bash
 python transformer_finetune.py \
-  --train_file_path data/train.csv \
-  --dev_file_path data/dev.csv \
-  --test_file_path data/test.csv \
+  --train_file_path ../sample/train.csv \
+  --dev_file_path ../sample/dev.csv \
+  --test_file_path ../sample/test.csv \
   --subtask A \
   --model xlm-roberta-base \
-  --prediction_file_path predictions_transformer.csv
+  --prediction_file_path ../output/predictions_transformer.csv
+  --epochs 2
 ```
 
 *Notes:*
@@ -75,8 +75,8 @@ For the test CSV file, only the following columns are required:
 
 ```bash
 python binoculars_baseline.py \
-  --test_file_path data/test.csv \
-  --prediction_file_path predictions_binoculars.csv \
+  --test_file_path ../sample/test.csv \
+  --prediction_file_path ../output/predictions_binoculars.csv \
   --observer_model tiiuae/falcon-7b \
   --performer_model tiiuae/falcon-7b-instruct \
   --mode low-fpr \
