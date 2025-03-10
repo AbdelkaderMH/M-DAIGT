@@ -77,8 +77,8 @@ For the test CSV file, only the following columns are required:
 python binoculars_baseline.py \
   --test_file_path ../sample/test.csv \
   --prediction_file_path ../output/predictions_binoculars.csv \
-  --observer_model Qwen/Qwen2.5-1.5B \
-  --performer_model Qwen/Qwen2.5-1.5B-Instruct \
+  --observer_model tiiuae/Falcon3-3B-Base \
+  --performer_model tiiuae/Falcon3-3B-Instruct \
   --mode low-fpr \
   --max_token 512 \
   --use_bfloat16 \
