@@ -38,13 +38,13 @@ class Binoculars:
         self._assert_tokenizer_consistency(observer_name_or_path, performer_name_or_path)
         self.change_mode(mode, low_fpr_threshold, accuracy_threshold)
         # Use BitsAndBytesConfig for 8-bit quantization.
-        quant_config = BitsAndBytesConfig(load_in_8bit=True)
+        quant_config = BitsAndBytesConfig(load_in_4bit=True)
         self.observer_model = AutoModelForCausalLM.from_pretrained(
             observer_name_or_path,
             quantization_config=quant_config,
             device_map=DEVICE_1,
             trust_remote_code=True,
-            torch_dtype=torch.bfloat16 if use_bfloat16 else torch.float32,
+            torch_dtype="auto",
             token=os.environ.get("HF_TOKEN", None)
         )
         self.performer_model = AutoModelForCausalLM.from_pretrained(
@@ -52,7 +52,7 @@ class Binoculars:
             quantization_config=quant_config,
             device_map=DEVICE_2,
             trust_remote_code=True,
-            torch_dtype=torch.bfloat16 if use_bfloat16 else torch.float32,
+            torch_dtype="auto",
             token=os.environ.get("HF_TOKEN", None)
         )
         print("models loaded")
