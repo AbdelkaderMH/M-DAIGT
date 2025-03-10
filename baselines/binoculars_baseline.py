@@ -7,7 +7,7 @@ import torch
 import transformers
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from typing import Union, List, Tuple
-from utils import assert_tokenizer_consistency, entropy, perplexity 
+from utils import assert_tokenizer_consistency, entropy, perplexity  
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -25,8 +25,7 @@ class Binoculars:
     
     Given an input text, the Binoculars method computes a score based on the ratio of
     the perplexity (from the performer model) and the entropy (between the observer and performer),
-    and then classifies the input as "machine" if the score is below a threshold,
-    and "human" otherwise.
+    and then classifies the input as "machine" if the score is below a threshold, and "human" otherwise.
     """
     def __init__(
         self,
@@ -109,7 +108,7 @@ class Binoculars:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Binoculars Zero-Shot Detection Baseline"
+        description="Binoculars Zero-Shot Detection"
     )
     parser.add_argument("--test_file_path", "-t", required=True,
                         help="Path to the test CSV file (with columns: id, text).", type=str)
