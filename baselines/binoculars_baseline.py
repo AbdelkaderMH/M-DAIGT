@@ -9,12 +9,10 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 from typing import Union, List, Tuple
 from utils import assert_tokenizer_consistency, entropy, perplexity  
 
-# Set up logging
 logging.basicConfig(level=logging.INFO)
 
-# Default thresholds
-DEFAULT_BINOCULARS_ACCURACY_THRESHOLD = 0.9015310749276843  # optimized for f1-score
-DEFAULT_BINOCULARS_FPR_THRESHOLD = 0.8536432310785527         # optimized for low-fpr
+DEFAULT_BINOCULARS_ACCURACY_THRESHOLD = 0.9015310749276843
+DEFAULT_BINOCULARS_FPR_THRESHOLD = 0.8536432310785527
 
 DEVICE_1 = "cuda:0" if torch.cuda.is_available() else "cpu"
 DEVICE_2 = "cuda:1" if torch.cuda.device_count() > 1 else DEVICE_1
@@ -23,9 +21,9 @@ class Binoculars:
     """
     Zero-shot detection baseline.
     
-    Given an input text, the Binoculars method computes a score based on the ratio of
-    the perplexity (from the performer model) and the entropy (between the observer and performer),
-    and then classifies the input as "machine" if the score is below a threshold, and "human" otherwise.
+    Given an input text, this method computes a score (perplexity/entropy)
+    and classifies the input as "machine" if the score is below a threshold,
+    and "human" otherwise.
     """
     def __init__(
         self,
@@ -39,19 +37,22 @@ class Binoculars:
     ) -> None:
         self._assert_tokenizer_consistency(observer_name_or_path, performer_name_or_path)
         self.change_mode(mode, low_fpr_threshold, accuracy_threshold)
-        
+        # Use BitsAndBytesConfig for 8-bit quantization.
+        quant_config = BitsAndBytesConfig(load_in_8bit=True)
         self.observer_model = AutoModelForCausalLM.from_pretrained(
             observer_name_or_path,
+            quantization_config=quant_config,
             device_map=DEVICE_1,
             trust_remote_code=True,
-            torch_dtype="auto",
+            torch_dtype=torch.bfloat16 if use_bfloat16 else torch.float32,
             token=os.environ.get("HF_TOKEN", None)
         )
         self.performer_model = AutoModelForCausalLM.from_pretrained(
             performer_name_or_path,
+            quantization_config=quant_config,
             device_map=DEVICE_2,
             trust_remote_code=True,
-            torch_dtype="auto",
+            torch_dtype=torch.bfloat16 if use_bfloat16 else torch.float32,
             token=os.environ.get("HF_TOKEN", None)
         )
         self.observer_model.eval()
@@ -102,6 +103,8 @@ class Binoculars:
         return scores[0] if isinstance(input_text, str) else scores.tolist()
 
     def predict(self, input_text: Union[List[str], str]) -> Union[str, List[str]]:
+        # Clear unused GPU memory before prediction.
+        torch.cuda.empty_cache()
         scores = np.array(self.compute_score(input_text))
         predictions = np.where(scores < self.threshold, "machine", "human")
         return predictions.tolist() if isinstance(input_text, list) else predictions.item()
