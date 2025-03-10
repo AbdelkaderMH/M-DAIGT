@@ -41,14 +41,12 @@ class Binoculars:
         self.change_mode(mode, low_fpr_threshold, accuracy_threshold)
         self.observer_model = AutoModelForCausalLM.from_pretrained(
             observer_name_or_path,
-            device_map={"": DEVICE_1},
             trust_remote_code=True,
             torch_dtype="auto",
             device_map="auto"
         )
         self.performer_model = AutoModelForCausalLM.from_pretrained(
             performer_name_or_path,
-            device_map={"": DEVICE_2},
             trust_remote_code=True,
             torch_dtype="auto",
             device_map="auto"
