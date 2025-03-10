@@ -50,7 +50,7 @@ class Binoculars:
             quantization_config=quant_config,
             device_map="auto",
             trust_remote_code=True,
-            torch_dtype=torch.bfloat16 if use_bfloat16 else torch.float32,
+            torch_dtype="auto",
             token=os.environ.get("HF_TOKEN", None)
         )
         self.performer_model = AutoModelForCausalLM.from_pretrained(
@@ -58,7 +58,7 @@ class Binoculars:
             quantization_config=quant_config,
             device_map="auto",
             trust_remote_code=True,
-            torch_dtype=torch.bfloat16 if use_bfloat16 else torch.float32,
+            torch_dtype="auto",
             token=os.environ.get("HF_TOKEN", None)
         )
         self.observer_model.eval()
