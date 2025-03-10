@@ -54,7 +54,7 @@ python transformer_finetune.py \
   --subtask A \
   --model xlm-roberta-base \
   --prediction_file_path ../output/predictions_transformer.csv
-  --epochs 2
+  --epochs 4
 ```
 
 *Notes:*
@@ -77,8 +77,8 @@ For the test CSV file, only the following columns are required:
 python binoculars_baseline.py \
   --test_file_path ../sample/test.csv \
   --prediction_file_path ../output/predictions_binoculars.csv \
-  --observer_model tiiuae/falcon-7b \
-  --performer_model tiiuae/falcon-7b-instruct \
+  --observer_model Qwen/Qwen2.5-1.5B \
+  --performer_model Qwen/Qwen2.5-1.5B-Instruct \
   --mode low-fpr \
   --max_token 512 \
   --use_bfloat16 \
