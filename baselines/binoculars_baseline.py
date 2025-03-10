@@ -42,12 +42,14 @@ class Binoculars:
         self.observer_model = AutoModelForCausalLM.from_pretrained(
             observer_name_or_path,
             trust_remote_code=True,
+            load_in_8bit=True,  
             torch_dtype="auto",
             device_map="auto"
         )
         self.performer_model = AutoModelForCausalLM.from_pretrained(
             performer_name_or_path,
             trust_remote_code=True,
+            load_in_8bit=True,  
             torch_dtype="auto",
             device_map="auto"
         )
