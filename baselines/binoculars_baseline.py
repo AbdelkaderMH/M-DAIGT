@@ -43,15 +43,15 @@ class Binoculars:
             observer_name_or_path,
             device_map={"": DEVICE_1},
             trust_remote_code=True,
-            torch_dtype=torch.bfloat16 if use_bfloat16 else torch.float32,
-            token=os.environ.get("HF_TOKEN", None)
+            torch_dtype="auto",
+            device_map="auto"
         )
         self.performer_model = AutoModelForCausalLM.from_pretrained(
             performer_name_or_path,
             device_map={"": DEVICE_2},
             trust_remote_code=True,
-            torch_dtype=torch.bfloat16 if use_bfloat16 else torch.float32,
-            token=os.environ.get("HF_TOKEN", None)
+            torch_dtype="auto",
+            device_map="auto"
         )
         self.observer_model.eval()
         self.performer_model.eval()
