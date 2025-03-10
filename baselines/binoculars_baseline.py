@@ -40,14 +40,8 @@ class Binoculars:
         self._assert_tokenizer_consistency(observer_name_or_path, performer_name_or_path)
         self.change_mode(mode, low_fpr_threshold, accuracy_threshold)
         
-        # Set up quantization configuration for 8-bit loading.
-        quant_config = BitsAndBytesConfig(load_in_8bit=True)
-        # Alternatively, for debugging, you might set load_in_8bit=False:
-        # quant_config = None
-
         self.observer_model = AutoModelForCausalLM.from_pretrained(
             observer_name_or_path,
-            quantization_config=quant_config,
             device_map="auto",
             trust_remote_code=True,
             torch_dtype="auto",
@@ -55,7 +49,6 @@ class Binoculars:
         )
         self.performer_model = AutoModelForCausalLM.from_pretrained(
             performer_name_or_path,
-            quantization_config=quant_config,
             device_map="auto",
             trust_remote_code=True,
             torch_dtype="auto",
