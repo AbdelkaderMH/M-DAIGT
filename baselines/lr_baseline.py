@@ -63,7 +63,7 @@ def train_ml_model(train_df, dev_df, ngram_range=(1, 2), analyzer="word"):
     print("Dev F1 Score (micro):", f1_micro)
     print("Dev F1 Score (macro):", f1_macro)
     print("\nClassification Report on Dev Set:")
-    print(classification_report(y_dev, y_dev_pred, digits=4, labels=["human", "machine"]))
+    print(classification_report(y_dev, y_dev_pred, digits=4))
     
     return vectorizer, clf
 
