@@ -55,6 +55,7 @@ class Binoculars:
             torch_dtype=torch.bfloat16 if use_bfloat16 else torch.float32,
             token=os.environ.get("HF_TOKEN", None)
         )
+        print("models loaded")
         self.observer_model.eval()
         self.performer_model.eval()
         self.tokenizer = AutoTokenizer.from_pretrained(observer_name_or_path)
