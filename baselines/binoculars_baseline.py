@@ -42,14 +42,14 @@ class Binoculars:
         
         self.observer_model = AutoModelForCausalLM.from_pretrained(
             observer_name_or_path,
-            device_map="auto",
+            device_map=DEVICE_1,
             trust_remote_code=True,
             torch_dtype="auto",
             token=os.environ.get("HF_TOKEN", None)
         )
         self.performer_model = AutoModelForCausalLM.from_pretrained(
             performer_name_or_path,
-            device_map="auto",
+            device_map=DEVICE_2,
             trust_remote_code=True,
             torch_dtype="auto",
             token=os.environ.get("HF_TOKEN", None)
